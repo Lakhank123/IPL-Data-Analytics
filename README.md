@@ -1,4 +1,4 @@
-# IPL InsightX ☕ — Coffee Edition
+# IPL InsightX ☕
 
 An interactive historical IPL analytics website built for a **Big Data Computing (BDC)** mini-project. The interface uses a warm coffee / cream design, interactive season filters, team analysis, batting and bowling leaderboards, venue exploration, head-to-head comparisons, CSV exports and a Big Data Lab.
 
