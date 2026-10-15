@@ -1,16 +1,12 @@
 # IPL InsightX
 
-IPL InsightX is a historical Indian Premier League analytics project. It provides two ways to explore match and ball-by-ball data:
+IPL InsightX is a historical Indian Premier League analytics project. Its standalone website provides interactive analysis of match and ball-by-ball data. A Python and PySpark pipeline ingests the source data and creates analytical datasets.
 
-- A Streamlit dashboard for interactive analysis directly from CSV files.
-- A standalone HTML, CSS, and JavaScript website that reads a generated JSON dataset.
-
-Both interfaces use season filters, interactive charts, analytical tables, and CSV downloads. The project also includes a PySpark ETL pipeline that writes Silver and Gold Parquet datasets.
+The website uses season filters, interactive charts, analytical tables, and CSV downloads. It reads a generated JSON dataset and deploys as a static site on Vercel.
 
 ## Project structure
 
 ```text
-dashboard/app.py       Streamlit dashboard
 src/ingestion.py       Cricsheet JSON archive to raw CSV
 src/pipeline.py        PySpark ETL to Silver and Gold Parquet
 src/export_web.py      Raw CSV to browser-ready JSON
@@ -21,7 +17,7 @@ data/silver/           Cleaned match and delivery Parquet datasets
 data/gold/             Season summary and batting Parquet datasets
 ```
 
-The `data/` directories are local data artifacts and are not included in source control.
+The `data/` directories are local data artifacts and are not included in source control. `website/analytics.json` is committed so the deployed site has its dataset without running Python or Spark.
 
 ## Data flow and architecture
 
@@ -33,25 +29,19 @@ src.ingestion
           |
           v
 data/raw/matches.csv + deliveries.csv
-          |                         |
-          |                         +--> dashboard/app.py
-          |                              Streamlit + Pandas + Plotly
-          |
           +--> src.pipeline
           |       PySpark (local[*])
           |          +--> data/silver/matches
           |          +--> data/silver/deliveries (partitioned by season)
           |          +--> data/gold/season_summary
           |          +--> data/gold/batting
-          |
-          +--> src.export_web
-                  +--> website/analytics.json
-                           |
-                           v
-                  website/ (static browser application)
+          +--> src.export_web --> website/analytics.json
+                                      |
+                                      v
+                               website/ (static browser application)
 ```
 
-The dashboard reads and caches the raw CSV files; it does not start Spark during normal page use. The browser site reads `website/analytics.json`, which is generated from the same CSV inputs. The Spark pipeline is a separate ETL path for the project's distributed-data processing demonstration.
+The browser site reads the committed `website/analytics.json`. Regenerate it from the raw CSV files with `src.export_web`; this does not require Spark. The Spark pipeline is a separate ETL path for the project's distributed-data processing demonstration.
 
 ## Setup
 
@@ -67,7 +57,7 @@ Python 3.10 or newer is recommended. The Spark ETL requires a working Java runti
 
 ### Obtain the raw data
 
-If `data/raw/matches.csv` and `data/raw/deliveries.csv` are already available, proceed to run an interface. Otherwise, download and convert the Cricsheet IPL JSON archive:
+If `data/raw/matches.csv` and `data/raw/deliveries.csv` are already available, proceed to run the website or regenerate its data. Otherwise, download and convert the Cricsheet IPL JSON archive:
 
 ```powershell
 python -m src.ingestion
@@ -84,14 +74,6 @@ The importer writes:
 - `data/raw/matches.csv`: one row per match, including season, teams, venue, toss, and result.
 - `data/raw/deliveries.csv`: one row per delivery event, including batting, bowling, runs, extras, and dismissal fields.
 
-### Run the Streamlit dashboard
-
-```powershell
-python -m streamlit run dashboard/app.py
-```
-
-Open the local URL printed by Streamlit (normally `http://localhost:8501`). Available views are Overview, Team Lab, Batting Studio, Bowling Studio, Venue Explorer, Head-to-Head, Big Data Lab, and Data & Sources.
-
 ### Run the standalone browser website
 
 Generate the website data, then serve the `website` directory:
@@ -103,6 +85,10 @@ python -m http.server 8080 -d website
 
 Open `http://localhost:8080`. Serve the directory over HTTP rather than opening `index.html` directly, so the browser can load `analytics.json`. Plotly.js is loaded from a CDN, so charts require an internet connection.
 
+### Deploy to Vercel
+
+Import the GitHub repository into Vercel and set the project **Root Directory** to `website`. The included `vercel.json` configures a static deployment; no Python, Spark, or build step is required. The committed `analytics.json` supplies the website data. Charts and fonts use external CDNs and require internet access in the visitor's browser.
+
 ### Run the Spark ETL
 
 ```powershell
@@ -113,7 +99,7 @@ The pipeline reads the raw CSV files, validates and joins delivery records with 
 
 ## Analytics and methodology
 
-The dashboards provide:
+The website provides:
 
 - Season-level match, run, six, and winner summaries.
 - Team wins, win rates, toss outcomes, and opponent comparisons.

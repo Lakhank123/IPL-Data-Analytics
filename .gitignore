@@ -1,12 +1,14 @@
-@'
 .venv/
 venv/
 __pycache__/
 .pytest_cache/
-*.pyc
+*.py[cod]
+
 .env
 .env.*
 !.env.example
+.streamlit/secrets.toml
+delete/
 
 hadoop/
 data/raw/
@@ -16,4 +18,3 @@ data/gold/
 .vscode/
 .vercel/
 .DS_Store
-'@ | Set-Content -Encoding utf8 .gitignore
