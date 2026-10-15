@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#34251c"/>
+  <title>IPL InsightX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ui-refinements.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#overview" aria-label="IPL InsightX overview" title="Go to overview">
+      <span class="brandmark">IX</span>
+      <span class="brand-copy">IPL <b>InsightX</b><small>CRICKET INTELLIGENCE</small></span>
+    </a>
+    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
+      <span class="toggle-icon" aria-hidden="true">‹</span>
+      <span class="toggle-label">Collapse</span>
+    </button>
+    <p class="navhead">WORKSPACE</p>
+    <nav id="nav">
+      <button class="navitem active" data-view="overview" title="Overview"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Overview</span></button>
+      <button class="navitem" data-view="teams" title="Team Lab"><span class="nav-icon" aria-hidden="true">♜</span><span class="nav-label">Team Lab</span></button>
+      <button class="navitem" data-view="batting" title="Batting Studio"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Batting Studio</span></button>
+      <button class="navitem" data-view="bowling" title="Bowling Studio"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">Bowling Studio</span></button>
+      <button class="navitem" data-view="venues" title="Venue Explorer"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Venue Explorer</span></button>
+      <button class="navitem" data-view="headtohead" title="Head to Head"><span class="nav-icon" aria-hidden="true">⚔</span><span class="nav-label">Head to Head</span></button>
+      <button class="navitem" data-view="engineering" title="Big Data Lab"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Big Data Lab</span></button>
+      <button class="navitem" data-view="sources" title="Data Sources"><span class="nav-icon" aria-hidden="true">ℹ</span><span class="nav-label">Data Sources</span></button>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="topline">
+      <div>
+        <span class="eyebrow">INDIAN PREMIER LEAGUE / ANALYTICS</span>
+        <h1 id="heading">Cricket, decoded.</h1>
+        <p id="subheading">An intelligent way to explore the numbers behind every season.</p>
+      </div>
+      <div class="global-controls">
+        <label for="season">SEASON</label>
+        <select id="season"><option value="all">All seasons</option></select>
+      </div>
+    </div>
+    <section class="hero" id="overviewHero" aria-label="IPL analytics overview">
+      <div>
+        <h2>Where cricket meets<br><em>data intelligence.</em></h2>
+        <p>Explore IPL performance with thoughtful analytics, clear visuals and player insights.</p>
+      </div>
+    </section>
+    <div id="message"></div>
+    <section id="content" aria-live="polite"></section>
+    <footer>BDC Mini Project • IPL Data Analytics</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

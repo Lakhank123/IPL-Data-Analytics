@@ -1,0 +1,19 @@
+@'
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.env.*
+!.env.example
+
+hadoop/
+data/raw/
+data/silver/
+data/gold/
+
+.vscode/
+.vercel/
+.DS_Store
+'@ | Set-Content -Encoding utf8 .gitignore
