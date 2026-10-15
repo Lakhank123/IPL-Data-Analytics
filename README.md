@@ -1,98 +1,141 @@
-# IPL InsightX ☕
+# IPL InsightX
 
-An interactive historical IPL analytics website built for a **Big Data Computing (BDC)** mini-project. The interface uses a warm coffee / cream design, interactive season filters, team analysis, batting and bowling leaderboards, venue exploration, head-to-head comparisons, CSV exports and a Big Data Lab.
+IPL InsightX is a historical Indian Premier League analytics project. It provides two ways to explore match and ball-by-ball data:
 
-## What is inside
+- A Streamlit dashboard for interactive analysis directly from CSV files.
+- A standalone HTML, CSS, and JavaScript website that reads a generated JSON dataset.
 
-- `dashboard/app.py`: full Streamlit website (eight interactive sections).
-- `src/ingestion.py`: downloads IPL JSON from Cricsheet and normalizes it to CSV.
-- `src/pipeline.py`: executes local PySpark ETL to Silver and Gold Parquet.
-- `tests/`: ingestion tests.
-- `.streamlit/config.toml`: cream, brown, and coffee theme.
-- `data/raw/`, `data/silver/`, `data/gold/`: generated at runtime; the ZIP ships without your existing dataset.
+Both interfaces use season filters, interactive charts, analytical tables, and CSV downloads. The project also includes a PySpark ETL pipeline that writes Silver and Gold Parquet datasets.
 
-## Install and launch on Windows
+## Project structure
 
-Open PowerShell in the project directory:
+```text
+dashboard/app.py       Streamlit dashboard
+src/ingestion.py       Cricsheet JSON archive to raw CSV
+src/pipeline.py        PySpark ETL to Silver and Gold Parquet
+src/export_web.py      Raw CSV to browser-ready JSON
+website/               Standalone browser application
+tests/                 Ingestion tests
+data/raw/              matches.csv and deliveries.csv (generated or supplied)
+data/silver/           Cleaned match and delivery Parquet datasets
+data/gold/             Season summary and batting Parquet datasets
+```
+
+The `data/` directories are local data artifacts and are not included in source control.
+
+## Data flow and architecture
+
+```text
+Cricsheet IPL JSON archive
+          |
+          v
+src.ingestion
+          |
+          v
+data/raw/matches.csv + deliveries.csv
+          |                         |
+          |                         +--> dashboard/app.py
+          |                              Streamlit + Pandas + Plotly
+          |
+          +--> src.pipeline
+          |       PySpark (local[*])
+          |          +--> data/silver/matches
+          |          +--> data/silver/deliveries (partitioned by season)
+          |          +--> data/gold/season_summary
+          |          +--> data/gold/batting
+          |
+          +--> src.export_web
+                  +--> website/analytics.json
+                           |
+                           v
+                  website/ (static browser application)
+```
+
+The dashboard reads and caches the raw CSV files; it does not start Spark during normal page use. The browser site reads `website/analytics.json`, which is generated from the same CSV inputs. The Spark pipeline is a separate ETL path for the project's distributed-data processing demonstration.
+
+## Setup
+
+The commands below use PowerShell on Windows. From the project directory:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-python -m pip install 'pandas>=2.2,<3'
+```
+
+Python 3.10 or newer is recommended. The Spark ETL requires a working Java runtime compatible with the installed PySpark version. Some Windows Spark installations also require matching Hadoop native utilities.
+
+### Obtain the raw data
+
+If `data/raw/matches.csv` and `data/raw/deliveries.csv` are already available, proceed to run an interface. Otherwise, download and convert the Cricsheet IPL JSON archive:
+
+```powershell
 python -m src.ingestion
+```
+
+To convert a previously downloaded archive without accessing the network:
+
+```powershell
+python -m src.ingestion --zip path\to\ipl_json.zip
+```
+
+The importer writes:
+
+- `data/raw/matches.csv`: one row per match, including season, teams, venue, toss, and result.
+- `data/raw/deliveries.csv`: one row per delivery event, including batting, bowling, runs, extras, and dismissal fields.
+
+### Run the Streamlit dashboard
+
+```powershell
 python -m streamlit run dashboard/app.py
 ```
 
-Open the local URL (normally http://localhost:8501). The interactive website requires `data/raw/matches.csv` and `data/raw/deliveries.csv`; it does **not** need to start Spark on each page visit.
+Open the local URL printed by Streamlit (normally `http://localhost:8501`). Available views are Overview, Team Lab, Batting Studio, Bowling Studio, Venue Explorer, Head-to-Head, Big Data Lab, and Data & Sources.
 
-To generate the **Big Data Computing** Silver/Gold layers separately:
+### Run the standalone browser website
 
-```powershell
-python -m src.pipeline
-```
-
-**Windows Spark requirement:** Some Spark/Hadoop distributions require the native Windows Hadoop utilities `winutils.exe` and `hadoop.dll`, matching the Hadoop dependency bundled with your Spark build. Do not create blank placeholder files. Configure `HADOOP_HOME` and `PATH` to point to your verified binaries. Alternatively, use WSL2. Never redistribute unverified third-party binaries as part of this project.
-
-## Data and methodology
-
-- **Primary source:** [Cricsheet Downloads](https://cricsheet.org/downloads/) — IPL ball-by-ball JSON archive.
-- **Schema:** [Cricsheet JSON format](https://cricsheet.org/format/json/).
-- **ESPNcricinfo:** [ESPNcricinfo cricket coverage](https://www.espncricinfo.com/) is linked for reference only. No live ESPN dataset, scraping, API or ESPN affiliation is implemented.
-- No live matches or scores are claimed. Data coverage is determined by when you last ran ingestion.
-
-The starter importer uses one record per delivery and retains the first dismissal if multiple wickets occur on a ball. As a result, aggregate official scorecard wicket totals may differ in rare circumstances. Historical team names remain distinct. Win rate includes all fixtures in the denominator. See the in-app **Data & Sources** page.
-
-## Big Data concepts used
-
-| Concept | Implementation |
-|---|---|
-| ETL | Python ingestion -> raw CSV -> PySpark Silver / Gold tables |
-| Distributed API | Spark DataFrame transformations and aggregations |
-| Storage | Column-oriented Parquet |
-| Partitioning | Silver delivery records partitioned by season |
-| Joins | Deliveries joined to match dimension on match_id |
-| Query optimization | Materialized Gold tables and Streamlit cached reads |
-| Local computing | Spark `local[*]`, **not** a multi-node cluster or HDFS |
-| Frontend analytics | Streamlit, Plotly and cached Pandas exploration |
-
-**Performance benchmarking is not yet implemented.** Do not claim benchmark speedups or a Hadoop distributed cluster in your BDC report.
-
-## Main features
-
-1. Overview: season runs, sixes, top batters and winners.
-2. Team Lab: wins, toss influence, season breakdown and rivals.
-3. Batting Studio: strike rate, runs, boundary stats, comparison charts.
-4. Bowling Studio: wickets, bowling economy, player ranking filters.
-5. Venue Explorer: first-innings score distribution and match records.
-6. Head-to-Head: historical records, win splits and game list.
-7. Big Data Lab: pipeline status, artifact availability, BDC mapping.
-8. Data & Sources: source provenance, limitations and samples.
-
-## Quality and performance
-
-- `@st.cache_data` loads 2 raw CSV files once until they change or the cache is cleared. Filtering happens in memory.
-- The application uses aggregate summaries and Plotly interactive charts, not Spark processes inside UI callbacks.
-- `python -m pytest` runs existing ingestion tests.
-- If you change data in-place and see stale results, use the Streamlit menu → Clear cache, then rerun.
-
-## Deployment / sharing
-
-Send a ZIP with project code plus your local `data/raw/` files if the recipient needs an offline runnable dashboard. Do not share `.venv`, `.git`, caches, or `hadoop` executables. Gold tables are optional for the user-facing interface but needed to show completed Spark output on the Big Data Lab page.
-
-For Streamlit Community Cloud, push this repository with an appropriate reproducible data ingestion strategy or hosted CSV/Parquet storage; Cloud will not automatically inherit local data folders. Respect Cricsheet and third-party redistribution terms.
-
-Educational academic mini-project; not associated with IPL, BCCI or ESPNcricinfo.
-
-## Standalone coffee-themed browser website (no Streamlit UI)
-
-This package **also includes an independent HTML/CSS/JavaScript website** in `website/`. Once you have `data/raw/` CSV files (copy them from the original project, or download with ingestion), run:
+Generate the website data, then serve the `website` directory:
 
 ```powershell
 python -m src.export_web
 python -m http.server 8080 -d website
 ```
 
-Open **http://localhost:8080** in a browser. The JSON exporter converts your actual local dataset into `website/analytics.json`, which the browser reads using `fetch()`. Charts use Plotly.js via CDN, so charts require an internet connection unless you bundle Plotly locally. If running from `file:///` instead of the local server, browsers may block the JSON request; use `http.server` as shown. The browser UI has its own navigation, interactive season and team filters, batting/bowling and venue explorations, head-to-head results, downloadable CSV tables, a BDC page and source documentation.
+Open `http://localhost:8080`. Serve the directory over HTTP rather than opening `index.html` directly, so the browser can load `analytics.json`. Plotly.js is loaded from a CDN, so charts require an internet connection.
 
-The standalone website **does not require Streamlit** after JSON is exported. The Spark pipeline is retained for your BDC mini-project. `analytics.json` is excluded from the ZIP because your actual CSV files are on your Windows laptop, not in this conversation. Run the exporter after copying those files in.
+### Run the Spark ETL
+
+```powershell
+python -m src.pipeline
+```
+
+The pipeline reads the raw CSV files, validates and joins delivery records with match metadata, writes Silver Parquet datasets, and produces Gold season and batting summaries. Spark runs in local mode (`local[*]`); this project does not configure a multi-node cluster or HDFS.
+
+## Analytics and methodology
+
+The dashboards provide:
+
+- Season-level match, run, six, and winner summaries.
+- Team wins, win rates, toss outcomes, and opponent comparisons.
+- Batting and bowling leaderboards with qualification filters and player comparisons.
+- Venue match records and first-innings score distributions.
+- Head-to-head results, historical match lists, and downloadable CSVs.
+- A Big Data Lab view describing pipeline outputs and data availability.
+
+The primary data source is the [Cricsheet IPL JSON archive](https://cricsheet.org/downloads/), using its [JSON format](https://cricsheet.org/format/json/). The analysis is historical and reflects the archive available when ingestion was run; it does not provide live scores.
+
+Interpret results with these data limitations in mind:
+
+- The importer emits one row per delivery and retains only the first dismissal when an event contains multiple dismissals.
+- `target_runs` is currently blank in the imported match table.
+- Historical franchise names are kept as supplied rather than consolidated across name changes.
+- Team win rates use all recorded fixtures, including no-results, as the denominator.
+- Bowling wicket totals count selected bowler-credited dismissal types only.
+
+## Tests
+
+Run the ingestion tests with:
+
+```powershell
+python -m pytest
+```
