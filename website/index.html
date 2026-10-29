@@ -1,61 +1,179 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#34251c"/>
-  <title>IPL InsightX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#19398A"/>
+  <title>IPL InsightX • Official Cricket Intelligence Platform</title>
+  <link rel="icon" type="image/png" href="ipl-official-logo.png" />
+  
+  <!-- Premium Sports Fonts: Plus Jakarta Sans (Executive Clean) & Outfit (Sharp Broadcast Display) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Plotly.js for interactive analytics charts -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  
+  <!-- Modern Stylesheets matching the Official IPL Royal & Sky Blue Palette -->
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="ui-refinements.css" />
 </head>
 <body>
+  <!-- Top Horizontal Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Ambient Stadium Glow Lights -->
+  <div class="ambient-glow glow-top" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom" aria-hidden="true"></div>
+
+  <!-- Navigation Sidebar -->
   <aside class="sidebar">
-    <a class="brand" href="#overview" aria-label="IPL InsightX overview" title="Go to overview">
-      <span class="brandmark">IX</span>
-      <span class="brand-copy">IPL <b>InsightX</b><small>CRICKET INTELLIGENCE</small></span>
-    </a>
-    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
-      <span class="toggle-icon" aria-hidden="true">‹</span>
-      <span class="toggle-label">Collapse</span>
-    </button>
-    <p class="navhead">WORKSPACE</p>
-    <nav id="nav">
-      <button class="navitem active" data-view="overview" title="Overview"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Overview</span></button>
-      <button class="navitem" data-view="teams" title="Team Lab"><span class="nav-icon" aria-hidden="true">♜</span><span class="nav-label">Team Lab</span></button>
-      <button class="navitem" data-view="batting" title="Batting Studio"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Batting Studio</span></button>
-      <button class="navitem" data-view="bowling" title="Bowling Studio"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">Bowling Studio</span></button>
-      <button class="navitem" data-view="venues" title="Venue Explorer"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Venue Explorer</span></button>
-      <button class="navitem" data-view="headtohead" title="Head to Head"><span class="nav-icon" aria-hidden="true">⚔</span><span class="nav-label">Head to Head</span></button>
-      <button class="navitem" data-view="engineering" title="Big Data Lab"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Big Data Lab</span></button>
-      <button class="navitem" data-view="sources" title="Data Sources"><span class="nav-icon" aria-hidden="true">ℹ</span><span class="nav-label">Data Sources</span></button>
-    </nav>
-  </aside>
-  <main class="main">
-    <div class="topline">
-      <div>
-        <span class="eyebrow">INDIAN PREMIER LEAGUE / ANALYTICS</span>
-        <h1 id="heading">Cricket, decoded.</h1>
-        <p id="subheading">An intelligent way to explore the numbers behind every season.</p>
+    <a class="brand" href="#overview" aria-label="IPL InsightX home overview" title="IPL InsightX Home">
+      <div class="brand-logo-wrap">
+        <img src="ipl-official-logo.png" alt="Indian Premier League Official Logo" class="brand-logo-img" />
       </div>
-      <div class="global-controls">
-        <label for="season">SEASON</label>
-        <select id="season"><option value="all">All seasons</option></select>
+      <div class="brand-copy">
+        <span class="brand-title">IPL <b class="royal-gradient-text">InsightX</b></span>
+        <small class="brand-tag"><span class="live-dot"></span>CRICKET INTELLIGENCE</small>
+      </div>
+    </a>
+
+    <!-- Theme Switcher & Sidebar Collapse Controls -->
+    <div class="sidebar-controls">
+      <button class="theme-toggle-btn" id="themeToggle" type="button" aria-label="Toggle light or dark stadium theme" title="Switch Stadium Theme">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+        <span class="theme-label" id="themeLabel">Night Stadium</span>
+      </button>
+
+      <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Collapse sidebar menu" aria-expanded="true" title="Collapse sidebar menu">
+        <span class="toggle-icon" aria-hidden="true">‹</span>
+        <span class="toggle-label">Collapse Menu</span>
+      </button>
+    </div>
+
+    <p class="navhead">ANALYTICS LAB</p>
+    <nav id="nav" aria-label="Main navigation">
+      <button class="navitem active" data-view="overview" title="⚡ Overview">
+        <span class="nav-icon" aria-hidden="true">⚡</span>
+        <span class="nav-label">Overview</span>
+      </button>
+      <button class="navitem" data-view="teams" title="🛡️ Team Lab">
+        <span class="nav-icon" aria-hidden="true">🛡️</span>
+        <span class="nav-label">Team Lab</span>
+      </button>
+      <button class="navitem" data-view="batting" title="🏏 Batting Studio">
+        <span class="nav-icon" aria-hidden="true">🏏</span>
+        <span class="nav-label">Batting Studio</span>
+      </button>
+      <button class="navitem" data-view="bowling" title="🎯 Bowling Studio">
+        <span class="nav-icon" aria-hidden="true">🎯</span>
+        <span class="nav-label">Bowling Studio</span>
+      </button>
+      <button class="navitem" data-view="venues" title="🏟️ Venue Explorer">
+        <span class="nav-icon" aria-hidden="true">🏟️</span>
+        <span class="nav-label">Venue Explorer</span>
+      </button>
+      <button class="navitem" data-view="headtohead" title="⚔️ Head to Head">
+        <span class="nav-icon" aria-hidden="true">⚔️</span>
+        <span class="nav-label">Head to Head</span>
+      </button>
+      <button class="navitem" data-view="engineering" title="💻 Big Data Lab">
+        <span class="nav-icon" aria-hidden="true">💻</span>
+        <span class="nav-label">Big Data Lab</span>
+      </button>
+      <button class="navitem" data-view="sources" title="ℹ️ Data Sources">
+        <span class="nav-icon" aria-hidden="true">ℹ️</span>
+        <span class="nav-label">Data Sources</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-pill">
+        <span class="pulse-ring"></span>
+        <div class="status-text">
+          <strong>19 SEASONS LIVE</strong>
+          <small>1,243 Fixtures Decoded</small>
+        </div>
       </div>
     </div>
+  </aside>
+
+  <!-- Main Content Stage -->
+  <main class="main">
+    <header class="topline">
+      <div class="topline-left">
+        <div class="eyebrow-badge">
+          <span class="badge-icon">🏏</span>
+          <span class="eyebrow">INDIAN PREMIER LEAGUE • HISTORICAL INTELLIGENCE ENGINE</span>
+        </div>
+        <h1 id="heading">Cricket, Decoded.</h1>
+        <p id="subheading">An executive analytics command center to explore the numbers behind every IPL season.</p>
+      </div>
+
+      <div class="global-controls">
+        <label for="season"><span class="control-icon">🏆</span> FILTER TOURNAMENT SEASON</label>
+        <div class="select-wrapper">
+          <select id="season" aria-label="Select season to analyze">
+            <option value="all">🏆 All seasons (2008–2024)</option>
+          </select>
+          <span class="select-chevron" aria-hidden="true">▼</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Showcase Section featuring the Official Logo -->
     <section class="hero" id="overviewHero" aria-label="IPL analytics overview">
-      <div>
-        <h2>Where cricket meets<br><em>data intelligence.</em></h2>
-        <p>Explore IPL performance with thoughtful analytics, clear visuals and player insights.</p>
+      <div class="hero-content">
+        <div class="hero-chip">
+          <span class="hero-chip-dot"></span>
+          <span>OFFICIAL BALL-BY-BALL DATA ARCHIVE</span>
+        </div>
+        <h2>Where High-Octane Cricket Meets<br><em class="royal-gradient-text">Big Data Intelligence.</em> 🏏⚡</h2>
+        <p>Unravel match outcomes, batting powerplays, bowling economy rates, venue dynamics, and legendary franchise rivalries powered by Apache Spark and historical Cricsheet analytics.</p>
+        <div class="hero-features">
+          <span class="hero-tag">⚡ 295,732 Delivery Events</span>
+          <span class="hero-tag">🏆 1,243 Match Scorecards</span>
+          <span class="hero-tag">📊 Broadcast-Grade Interactive Charts</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-logo-card">
+          <img src="ipl-official-logo.png" alt="Indian Premier League Official Logo" class="hero-ipl-logo" />
+          <div class="hero-badge-footer">
+            <span class="badge-dot">●</span>
+            <span>CRICKET INTELLIGENCE SUITE</span>
+            <span class="badge-dot">●</span>
+          </div>
+        </div>
       </div>
     </section>
-    <div id="message"></div>
-    <section id="content" aria-live="polite"></section>
-    <footer>BDC Mini Project • IPL Data Analytics</footer>
+
+    <!-- Dynamic Notification / Status Container -->
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <!-- Dynamic Analytics View Container -->
+    <section id="content" aria-live="polite" class="content-stage"></section>
+
+    <!-- Professional Analytics Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img src="ipl-official-logo.png" alt="IPL Logo" class="footer-logo" />
+          <span>IPL <b>InsightX</b> Analytics Platform</span>
+        </div>
+        <p class="footer-copy">Big Data Computing Mini Project • Official historical datasets imported from Cricsheet archive • Powered by Apache Spark, Parquet &amp; Vanilla JavaScript</p>
+        <div class="footer-chips">
+          <span class="chip">🚀 Sub-Second Response</span>
+          <span class="chip">🔒 Zero External Trackers</span>
+          <span class="chip">📊 100% Deterministic Calculations</span>
+        </div>
+      </div>
+    </footer>
   </main>
+
+  <!-- Application Logic -->
   <script src="app.js"></script>
 </body>
 </html>
